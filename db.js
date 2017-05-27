@@ -18,11 +18,33 @@ exports.connect = function(mode, done) {
     user: 'aman',
     password: 'aman',
     database: mode === exports.MODE_PRODUCTION ? PRODUCTION_DB : TEST_DB
-  })
+  });
 
+  state.pool.getConnection(function(err,connection){
+    if (err) {
+     //connection.release();
+     return done({"code" : 100, "status" : "Error in connection database"});
+    }   
+
+    console.log('connected as id ' + connection.threadId);
+
+    connection.query("show tables",function(err,rows){
+       if(!err) {
+           connection.release();
+           console.log(rows);
+       }           
+    });
+
+    connection.on('error', function(err) {      
+         return done({"code" : 100, "status" : "Error in connection database"});   
+    });
+  });
+
+  //console.log(state.pool)
   state.mode = mode
   done()
 }
+
 
 exports.get = function() {
   return state.pool
