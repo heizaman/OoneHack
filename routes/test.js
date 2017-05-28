@@ -35,11 +35,40 @@ router.get('/testdb', function(req, res, next) {
 
 router.get('/:id', function(req, res, next) {
 	var id = req.params.id;
-	var data = {
-		id : id,
-		email : "blabla@gmail.com"
-	};
-	res.json(data);
+	var sql = "SELECT * FROM products WHERE id = ?";
+
+	db.get().query(sql, [id], function(err, result) {
+	    if (err) {
+	    	console.log(err);
+	    	res.json({ status: "failed" });
+	    }
+	    else {
+	    	console.log(result);
+
+	    	var data = {
+				id : id,
+				name : result[0].name,
+				dop : result[0].dop,
+				owner : result[0].owner,
+				phone : result[0].phone,
+				website : result[0].website
+			};
+
+			var hissql = "SELECT * FROM pdthistory WHERE id = ? ORDER BY date DESC"
+
+			db.get().query(hissql, [id], function(err, hist) {
+		    	if (err) {
+		    		console.log(err);
+					res.json({ status: "success", data : data });
+
+			    }
+		    	else {
+			    	console.log(hist);
+    				res.json({ status: "success", data : data, history : hist });
+			    }
+			});
+	    }
+	});
 });
 
 
