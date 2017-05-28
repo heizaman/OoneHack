@@ -45,6 +45,9 @@ router.get('/:id', function(req, res, next) {
 	    else {
 	    	console.log(result);
 
+	    	if(result.length == 0)
+	    		return res.json({ status: "failed" });
+
 	    	var data = {
 				id : id,
 				name : result[0].name,
@@ -59,12 +62,12 @@ router.get('/:id', function(req, res, next) {
 			db.get().query(hissql, [id], function(err, hist) {
 		    	if (err) {
 		    		console.log(err);
-					res.json({ status: "success", data : data });
+					return res.json({ status: "success", data : data });
 
 			    }
 		    	else {
 			    	console.log(hist);
-    				res.json({ status: "success", data : data, history : hist });
+    				return res.json({ status: "success", data : data, history : hist });
 			    }
 			});
 	    }
